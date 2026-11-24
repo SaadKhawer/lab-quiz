@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Book Tracker | CS-301L</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+  <!-- Responsive Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
+        <i class="bi bi-journal-bookmark-fill fs-3"></i>
+        <span>Library Book Tracker</span>
+      </a>
+      <span class="navbar-text text-white-50 d-none d-md-inline">
+        CS-301L Full Stack Lab Quiz 01
+      </span>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-light text-primary px-3 py-2 fw-semibold" id="apiStatusBadge">
+          <i class="bi bi-circle-fill text-success me-1 small"></i> API Connected
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container my-4">
+
+    <!-- Top Stats Row -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card stat-card border-0 shadow-sm text-white bg-gradient-primary">
+          <div class="card-body d-flex align-items-center justify-content-between p-3">
+            <div>
+              <p class="text-uppercase small mb-1 fw-medium text-white-50">Total Books</p>
+              <h2 class="mb-0 fw-bold" id="statTotalBooks">0</h2>
+            </div>
+            <div class="stat-icon bg-white bg-opacity-25 rounded-circle p-3">
+              <i class="bi bi-bookshelf fs-3"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card stat-card border-0 shadow-sm text-white bg-gradient-success">
+          <div class="card-body d-flex align-items-center justify-content-between p-3">
+            <div>
+              <p class="text-uppercase small mb-1 fw-medium text-white-50">Categories</p>
+              <h2 class="mb-0 fw-bold" id="statTotalCategories">0</h2>
+            </div>
+            <div class="stat-icon bg-white bg-opacity-25 rounded-circle p-3">
+              <i class="bi bi-tags-fill fs-3"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card stat-card border-0 shadow-sm text-white bg-gradient-purple">
+          <div class="card-body d-flex align-items-center justify-content-between p-3">
+            <div>
+              <p class="text-uppercase small mb-1 fw-medium text-white-50">Active Filter</p>
+              <h4 class="mb-0 fw-bold text-truncate" id="statActiveFilter">All Books</h4>
+            </div>
+            <div class="stat-icon bg-white bg-opacity-25 rounded-circle p-3">
+              <i class="bi bi-funnel-fill fs-3"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert placeholder for interactive notifications -->
+    <div id="alertContainer"></div>
+
+    <div class="row g-4">
+
+      <!-- LEFT COLUMN: Add Book Form -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-3">
+          <div class="card-header bg-white border-0 pt-4 pb-2 px-4">
+            <h5 class="fw-bold text-primary mb-1 d-flex align-items-center gap-2">
+              <i class="bi bi-plus-circle-fill"></i> Add New Book
+            </h5>
+            <p class="text-muted small mb-0">Fill in all fields to add a book to the library.</p>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <form id="addBookForm" novalidate>
+
+              <!-- Title -->
+              <div class="mb-3">
+                <label for="bookTitle" class="form-label fw-semibold">Book Title <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-book"></i></span>
+                  <input type="text" class="form-control" id="bookTitle" placeholder="e.g. Clean Code" required>
+                </div>
+                <div class="invalid-feedback" id="titleFeedback">Please provide a book title.</div>
+              </div>
+
+              <!-- Author -->
+              <div class="mb-3">
+                <label for="bookAuthor" class="form-label fw-semibold">Author <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-person-fill"></i></span>
+                  <input type="text" class="form-control" id="bookAuthor" placeholder="e.g. Robert C. Martin" required>
+                </div>
+                <div class="invalid-feedback" id="authorFeedback">Please provide the author's name.</div>
+              </div>
+
+              <!-- Category -->
+              <div class="mb-3">
+                <label for="bookCategory" class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-tag-fill"></i></span>
+                  <select class="form-select" id="bookCategory" required>
+                    <option value="" selected disabled>Select a Category...</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Fiction">Fiction</option>
+                    <option value="Science">Science</option>
+                    <option value="History">History</option>
+                    <option value="Philosophy">Philosophy</option>
+                    <option value="Business">Business</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="invalid-feedback" id="categoryFeedback">Please choose a category.</div>
+              </div>
+
+              <!-- Publication Year -->
+              <div class="mb-4">
+                <label for="bookYear" class="form-label fw-semibold">Publication Year <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-calendar-event"></i></span>
+                  <input type="number" class="form-control" id="bookYear" placeholder="e.g. 2008" min="1" max="2030" required>
+                </div>
+                <div class="invalid-feedback" id="yearFeedback">Please enter a valid publication year.</div>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                <i class="bi bi-bookmark-plus-fill"></i> Add Book
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Category Filter & Books Display -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+          <div class="card-body p-4">
+            
+            <!-- Filter & Search Toolbar -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+              <div>
+                <h5 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                  <i class="bi bi-collection-fill text-primary"></i> Library Catalog
+                </h5>
+                <p class="text-muted small mb-0" id="catalogSubtitle">Showing all books</p>
+              </div>
+
+              <!-- Search Bar -->
+              <div class="input-group search-bar">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search by title or author...">
+                <button class="btn btn-outline-secondary" type="button" id="clearSearchBtn" title="Clear search">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Category Filter Pills (Built dynamically with map & arrow functions) -->
+            <div class="mb-3">
+              <label class="form-label small fw-semibold text-muted text-uppercase mb-2">Filter by Category:</label>
+              <div class="d-flex flex-wrap gap-2" id="categoryFilterContainer">
+                <!-- Dynamically populated via JavaScript -->
+              </div>
+            </div>
+
+            <!-- View Toggle: Cards vs Table -->
+            <div class="d-flex justify-content-between align-items-center border-top pt-3">
+              <span class="small text-muted" id="bookCounterLabel">Showing 0 books</span>
+              <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-primary active" id="viewCardsBtn" title="Cards View">
+                  <i class="bi bi-grid-fill me-1"></i> Cards
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="viewTableBtn" title="Table View">
+                  <i class="bi bi-table me-1"></i> Table
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Books Container (Cards View) -->
+        <div id="cardsViewContainer" class="row g-3">
+          <!-- Populated by JavaScript DOM manipulation -->
+        </div>
+
+        <!-- Books Container (Table View) -->
+        <div id="tableViewContainer" class="card border-0 shadow-sm rounded-3 d-none">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>Year</th>
+                    <th class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="booksTableBody">
+                  <!-- Populated by JavaScript DOM manipulation -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State View -->
+        <div id="emptyState" class="card border-0 shadow-sm rounded-3 text-center p-5 d-none">
+          <div class="my-4">
+            <i class="bi bi-journal-x display-1 text-muted"></i>
+            <h4 class="fw-bold mt-3 text-secondary">No Books Found</h4>
+            <p class="text-muted" id="emptyStateMessage">No books match your current category or search criteria.</p>
+            <button class="btn btn-outline-primary btn-sm mt-2" id="resetFiltersBtn">
+              <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Filters
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-top py-3 mt-5">
+    <div class="container text-center text-muted small">
+      Full Stack Web Development | CS-301L Lab Quiz 01 &copy; 2026. Built with HTML5, CSS3, Bootstrap 5, JavaScript & Node.js.
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Client JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>
